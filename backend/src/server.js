@@ -1,10 +1,14 @@
 require('dotenv').config();
+const ensureLocalDb = require('./config/ensureLocalDb');
 const app = require('./app');
 const db = require('./config/db');
 
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
+  // Ensure local PostgreSQL instance is running if using port 5433
+  ensureLocalDb();
+
   try {
     // Automatically ensure database and schema exist on startup
     const migrate = require('./db/migrate');

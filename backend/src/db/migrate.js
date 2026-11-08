@@ -4,6 +4,7 @@ const { Client, Pool } = require('pg');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
 require('dotenv').config();
+const ensureLocalDb = require('../config/ensureLocalDb');
 
 function getAdminConfig() {
   if (process.env.DATABASE_URL) {
@@ -65,6 +66,7 @@ async function ensureDatabaseExists(adminConfig) {
 }
 
 async function migrate(shouldClosePool = false) {
+  ensureLocalDb();
   const adminConfig = getAdminConfig();
   console.log(`[Migration] Starting database migration for: ${adminConfig.targetDb}...`);
 

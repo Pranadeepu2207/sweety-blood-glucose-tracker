@@ -88,3 +88,4 @@ export default function SlotProgress({ readingsForDate = [], onAddSlot }) {
     </div>
   );
 }
+

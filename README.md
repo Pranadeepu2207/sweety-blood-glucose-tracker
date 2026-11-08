@@ -192,3 +192,4 @@ npm test
 2. **CSV / PDF Clinical Export**: Allow patients to export their monthly summary as a structured PDF report to hand to their endocrinologist during clinical visits.
 3. **Automated Reminders**: Push notifications or browser reminders for unlogged daily slots after fasting or dinner.
 4. **Target Range Customization**: Allow patients with specific clinical guidelines to customize target ranges (e.g., gestational diabetes targets).
+

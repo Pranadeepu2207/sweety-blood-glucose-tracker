@@ -8,3 +8,4 @@ router.use(requireAuth);
 router.get('/summary', reportController.getReportsSummary);
 
 module.exports = router;
+

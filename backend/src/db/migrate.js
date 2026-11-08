@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
+require('dotenv').config();
 
 async function migrate() {
   const targetDb = process.env.PGDATABASE || 'sweety_db';
@@ -59,3 +61,4 @@ if (require.main === module) {
 }
 
 module.exports = migrate;
+

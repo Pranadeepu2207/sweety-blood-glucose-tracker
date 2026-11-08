@@ -9,6 +9,7 @@
     "start": "node backend/src/server.js",
     "build": "npm run build --prefix frontend",
     "test": "npm test --prefix backend",
+    "db:local": "npm run db:local --prefix backend",
     "migrate": "npm run migrate --prefix backend",
     "seed": "npm run seed --prefix backend",
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
@@ -17,3 +18,4 @@
     "concurrently": "^9.1.2"
   }
 }
+

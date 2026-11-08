@@ -45,3 +45,4 @@ export const api = {
     apiRequest(endpoint, { ...options, method: 'PUT', body: JSON.stringify(body) }),
   delete: (endpoint, options) => apiRequest(endpoint, { ...options, method: 'DELETE' })
 };
+

@@ -61,84 +61,52 @@ Each report computes: Highest, Lowest, Average (rounded to 1 decimal place), and
 
 ---
 
-## Getting Started
+## Quick Setup Guide (For Anyone Cloning This Repository)
 
-### Prerequisites
-- Node.js (v18.0.0 or higher)
-- npm (v9.0.0 or higher)
-- PostgreSQL (v14 or higher)
+When someone clones this repository, they need to initialize their local database instance. We have provided a single setup command:
 
----
-
-### Step 1: Clone the Repository
+### 1. Clone & Configure Environment
 ```bash
 git clone <repository-url>
 cd "sweety - blood glucose tracker"
-```
-
----
-
-### Step 2: Configure Environment Variables
-Copy `.env.example` into both root and `backend/`:
-
-```bash
 cp .env.example backend/.env
 ```
 
-Verify `backend/.env` contains your PostgreSQL credentials:
+Verify your PostgreSQL credentials in `backend/.env` (default is user `postgres` on port 5432):
 ```env
 PORT=5000
 NODE_ENV=development
-
-# PostgreSQL connection string or individual parameters:
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/sweety_db
-
-# Or:
 PGHOST=localhost
 PGPORT=5432
 PGUSER=postgres
 PGPASSWORD=postgres
 PGDATABASE=sweety_db
-
 JWT_SECRET=super_secret_sweety_jwt_key_replace_in_production
 JWT_EXPIRES_IN=7d
 ```
 
----
-
-### Step 3: Set Up Database & Seed Data
-Run migrations and seeds against your local PostgreSQL:
+### 2. Run All-In-One Setup
+Run this single command to install all dependencies, auto-create the database, apply migrations, and seed sample data:
 ```bash
-npm run migrate
-npm run seed
+npm run setup
 ```
+
+*(Alternatively, you can run the steps individually: `npm run install:all`, `npm run migrate`, and `npm run seed`).*
 
 **Demo Account Credentials:**
 - **Email**: `demo@sweety.app`
 - **Password**: `Password123!`
 
----
-
-### Step 4: Start Server & Client
-
-Run both concurrently from the root directory:
+### 3. Start the Application
 ```bash
 npm run dev
 ```
 
-Or run them in separate terminal windows:
+- **Frontend Client**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:5000](http://localhost:5000)
 
-**Terminal 1 (Backend API):**
-```bash
-npm run dev:backend
-# Runs at http://localhost:5000
-```
-
-**Terminal 2 (Frontend Client):**
-```bash
-npm run dev:frontend
-# Runs at http://localhost:3000
-```
+*Note: The backend server also includes automatic database initialization on startup, ensuring that `sweety_db` and tables exist whenever the server starts.*
 
 ---
 

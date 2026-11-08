@@ -6,7 +6,11 @@ const PORT = process.env.PORT || 5000;
 
 async function startServer() {
   try {
-    // Verify database connection on startup
+    // Automatically ensure database and schema exist on startup
+    const migrate = require('./db/migrate');
+    await migrate(false);
+
+    // Verify database connection
     const dbTime = await db.checkConnection();
     console.log(`[Sweety API] Connected to PostgreSQL successfully at ${dbTime.now}`);
 
@@ -24,4 +28,3 @@ async function startServer() {
 }
 
 startServer();
-

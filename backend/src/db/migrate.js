@@ -1,40 +1,74 @@
 const fs = require('fs');
 const path = require('path');
-const { Pool } = require('pg');
+const { Client, Pool } = require('pg');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
 require('dotenv').config();
 
-async function migrate() {
-  const targetDb = process.env.PGDATABASE || 'sweety_db';
-  console.log(`[Migration] Starting database migration for: ${targetDb}...`);
-
-  // Optional: attempt to create the database if connecting via standard credentials
-  if (!process.env.DATABASE_URL) {
-    const adminPool = new Pool({
-      host: process.env.PGHOST || 'localhost',
-      port: parseInt(process.env.PGPORT || '5432', 10),
-      user: process.env.PGUSER || 'postgres',
-      password: process.env.PGPASSWORD || 'postgres',
-      database: 'postgres'
-    });
-
+function getAdminConfig() {
+  if (process.env.DATABASE_URL) {
     try {
-      const checkDb = await adminPool.query(
-        'SELECT 1 FROM pg_database WHERE datname = $1',
-        [targetDb]
-      );
-      if (checkDb.rowCount === 0) {
-        console.log(`[Migration] Database "${targetDb}" does not exist. Creating it now...`);
-        await adminPool.query(`CREATE DATABASE "${targetDb}"`);
-        console.log(`[Migration] Database "${targetDb}" created successfully.`);
-      }
-    } catch (err) {
-      console.warn(`[Migration] Notice when checking/creating database "${targetDb}": ${err.message}`);
-    } finally {
-      await adminPool.end();
+      const parsed = new URL(process.env.DATABASE_URL);
+      return {
+        host: parsed.hostname || 'localhost',
+        port: parseInt(parsed.port || '5432', 10),
+        user: parsed.username || 'postgres',
+        password: parsed.password || undefined,
+        database: 'postgres',
+        targetDb: (parsed.pathname || '/sweety_db').replace(/^\//, '') || 'sweety_db'
+      };
+    } catch (e) {
+      // fallback
     }
   }
+
+  return {
+    host: process.env.PGHOST || 'localhost',
+    port: parseInt(process.env.PGPORT || '5432', 10),
+    user: process.env.PGUSER || 'postgres',
+    password: process.env.PGPASSWORD || undefined,
+    database: 'postgres',
+    targetDb: process.env.PGDATABASE || 'sweety_db'
+  };
+}
+
+async function ensureDatabaseExists(adminConfig) {
+  const client = new Client({
+    host: adminConfig.host,
+    port: adminConfig.port,
+    user: adminConfig.user,
+    password: adminConfig.password,
+    database: 'postgres'
+  });
+
+  try {
+    await client.connect();
+    const checkRes = await client.query(
+      'SELECT 1 FROM pg_database WHERE datname = $1',
+      [adminConfig.targetDb]
+    );
+
+    if (checkRes.rowCount === 0) {
+      console.log(`[Migration] Database "${adminConfig.targetDb}" does not exist. Creating it now...`);
+      await client.query(`CREATE DATABASE "${adminConfig.targetDb}"`);
+      console.log(`[Migration] Database "${adminConfig.targetDb}" created successfully.`);
+    } else {
+      console.log(`[Migration] Database "${adminConfig.targetDb}" already exists.`);
+    }
+  } catch (err) {
+    console.warn(`[Migration] Notice when checking/creating database: ${err.message}`);
+  } finally {
+    try {
+      await client.end();
+    } catch (e) {}
+  }
+}
+
+async function migrate(shouldClosePool = false) {
+  const adminConfig = getAdminConfig();
+  console.log(`[Migration] Starting database migration for: ${adminConfig.targetDb}...`);
+
+  await ensureDatabaseExists(adminConfig);
 
   // Connect to target database and apply schema
   const db = require('../config/db');
@@ -49,16 +83,17 @@ async function migrate() {
     console.error('[Migration] Failed to execute schema migration:', err);
     process.exit(1);
   } finally {
-    await db.pool.end();
+    if (shouldClosePool) {
+      await db.pool.end();
+    }
   }
 }
 
 if (require.main === module) {
-  migrate().then(() => {
+  migrate(true).then(() => {
     console.log('[Migration] Done.');
     process.exit(0);
   });
 }
 
 module.exports = migrate;
-

@@ -3,10 +3,15 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
 require('dotenv').config();
-const db = require('../config/db');
 
 async function seed() {
   console.log('[Seed] Starting database seeding for Sweety...');
+
+  // Ensure database and schema exist first
+  const migrate = require('./migrate');
+  await migrate();
+
+  const db = require('../config/db');
 
   try {
     // 1. Ensure tables exist

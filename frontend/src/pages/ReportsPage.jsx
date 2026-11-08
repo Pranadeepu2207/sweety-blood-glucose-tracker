@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 
 export default function ReportsPage() {
-  // Helper for today's date YYYY-MM-DD
   const getTodayString = () => {
     const now = new Date();
     const y = now.getFullYear();
@@ -25,7 +24,7 @@ export default function ReportsPage() {
 
   const todayStr = getTodayString();
   const [selectedDate, setSelectedDate] = useState(todayStr);
-  const [activeReportTab, setActiveReportTab] = useState('daily'); // 'daily', 'mtd', 'monthly'
+  const [activeReportTab, setActiveReportTab] = useState('daily');
   const [reportsData, setReportsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,7 +46,6 @@ export default function ReportsPage() {
     fetchReports();
   }, [fetchReports]);
 
-  // Format date helper (e.g. "15 Oct 2026")
   const formatDateDisplay = (dateStr) => {
     if (!dateStr) return '';
     const [y, m, d] = dateStr.split('-');
@@ -59,27 +57,27 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       {/* Top Header & Date Selection */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-brand-dark">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-brand-dark">
             Glucose Reports
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             Clinical summaries across daily, month-to-date, and previous-month timeframes.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5 sm:space-x-3">
           <div className="flex items-center space-x-2 bg-white border border-gray-300 rounded-md px-3 py-1.5 shadow-sm">
-            <Calendar className="w-4 h-4 text-gray-500" />
+            <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
             <input
               type="date"
               max={todayStr}
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="text-sm text-gray-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer"
+              className="text-xs sm:text-sm text-gray-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer"
             />
           </div>
 
@@ -94,17 +92,17 @@ export default function ReportsPage() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-brand-soft rounded-md flex items-center space-x-2 text-sm text-brand-crimson">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 text-brand-primary" />
+        <div className="mb-6 p-3.5 bg-red-50 border border-brand-soft rounded-md flex items-center space-x-2 text-xs sm:text-sm text-brand-crimson">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 text-brand-primary" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Report Navigation Tabs */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 p-2 flex flex-wrap gap-2">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 p-1.5 sm:p-2 flex flex-col sm:flex-row gap-1.5 sm:gap-2">
         <button
           onClick={() => setActiveReportTab('daily')}
-          className={`flex-1 min-w-[140px] px-4 py-2.5 rounded-md text-sm font-semibold transition-colors ${
+          className={`flex-1 py-2 sm:py-2.5 px-3 rounded-md text-xs sm:text-sm font-semibold transition-colors ${
             activeReportTab === 'daily'
               ? 'bg-brand-primary text-white shadow-sm'
               : 'text-gray-700 hover:bg-gray-100'
@@ -115,7 +113,7 @@ export default function ReportsPage() {
 
         <button
           onClick={() => setActiveReportTab('mtd')}
-          className={`flex-1 min-w-[140px] px-4 py-2.5 rounded-md text-sm font-semibold transition-colors ${
+          className={`flex-1 py-2 sm:py-2.5 px-3 rounded-md text-xs sm:text-sm font-semibold transition-colors ${
             activeReportTab === 'mtd'
               ? 'bg-brand-primary text-white shadow-sm'
               : 'text-gray-700 hover:bg-gray-100'
@@ -126,7 +124,7 @@ export default function ReportsPage() {
 
         <button
           onClick={() => setActiveReportTab('monthly')}
-          className={`flex-1 min-w-[140px] px-4 py-2.5 rounded-md text-sm font-semibold transition-colors ${
+          className={`flex-1 py-2 sm:py-2.5 px-3 rounded-md text-xs sm:text-sm font-semibold transition-colors ${
             activeReportTab === 'monthly'
               ? 'bg-brand-primary text-white shadow-sm'
               : 'text-gray-700 hover:bg-gray-100'
@@ -137,8 +135,8 @@ export default function ReportsPage() {
       </div>
 
       {loading ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-16 text-center text-sm text-gray-500 shadow-sm">
-          <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-brand-primary" />
+        <div className="bg-white border border-gray-200 rounded-lg p-12 sm:p-16 text-center text-xs sm:text-sm text-gray-500 shadow-sm">
+          <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-brand-primary" />
           Calculating report metrics...
         </div>
       ) : !reportsData ? null : (
@@ -146,17 +144,17 @@ export default function ReportsPage() {
           {/* TAB 1: DAILY REPORT */}
           {activeReportTab === 'daily' && (
             <div className="space-y-6">
-              {/* Report Header Card */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              {/* Header Range Card */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
                   <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                       Report Type
                     </span>
-                    <h2 className="text-lg font-bold text-brand-dark">Daily Report</h2>
+                    <h2 className="text-base sm:text-lg font-bold text-brand-dark">Daily Report</h2>
                   </div>
                   <div className="text-left sm:text-right">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                       Date Range
                     </span>
                     <div className="text-sm font-bold text-gray-900">
@@ -167,7 +165,7 @@ export default function ReportsPage() {
               </div>
 
               {/* Metrics Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <SummaryCard
                   title="Highest Reading"
                   value={reportsData.daily.highest}
@@ -197,8 +195,8 @@ export default function ReportsPage() {
 
               {/* Requirement: The daily report also lists each reading with its slot */}
               <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-sm font-bold text-brand-dark uppercase tracking-wider">
+                <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-gray-200">
+                  <h3 className="text-xs sm:text-sm font-bold text-brand-dark uppercase tracking-wider">
                     Daily Readings Breakdown
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
@@ -207,7 +205,7 @@ export default function ReportsPage() {
                 </div>
 
                 {reportsData.daily.count === 0 ? (
-                  <div className="p-6">
+                  <div className="p-4 sm:p-6">
                     <EmptyState
                       title="No readings on this date"
                       description={`No glucose readings were recorded on ${formatDateDisplay(selectedDate)}.`}
@@ -218,24 +216,24 @@ export default function ReportsPage() {
                     {reportsData.daily.readings.map((reading) => (
                       <div
                         key={reading.id}
-                        className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                       >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600">
+                        <div className="flex items-center space-x-2.5 sm:space-x-3">
+                          <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600 flex-shrink-0">
                             <Clock className="w-4 h-4" />
                           </div>
                           <div>
-                            <span className="text-sm font-bold text-brand-dark block">
+                            <span className="text-xs sm:text-sm font-bold text-brand-dark block">
                               {reading.slot}
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-[11px] text-gray-500">
                               Logged on {reading.reading_date}
                             </span>
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <div className="text-lg font-bold text-gray-900">
+                          <div className="text-base sm:text-lg font-bold text-gray-900">
                             {reading.value}{' '}
                             <span className="text-xs font-normal text-gray-500">mg/dl</span>
                           </div>
@@ -251,17 +249,17 @@ export default function ReportsPage() {
           {/* TAB 2: MONTH-TO-DATE (MTD) REPORT */}
           {activeReportTab === 'mtd' && (
             <div className="space-y-6">
-              {/* Report Header Card */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              {/* Header Range Card */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
                   <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                       Report Type
                     </span>
-                    <h2 className="text-lg font-bold text-brand-dark">Month-to-Date Report</h2>
+                    <h2 className="text-base sm:text-lg font-bold text-brand-dark">Month-to-Date Report</h2>
                   </div>
                   <div className="text-left sm:text-right">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                       Date Range
                     </span>
                     <div className="text-sm font-bold text-gray-900">
@@ -277,7 +275,7 @@ export default function ReportsPage() {
                   description="Start logging your daily glucose slots to view aggregated metrics."
                 />
               ) : (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   <SummaryCard
                     title="Highest Reading"
                     value={reportsData.monthToDate.highest}
@@ -311,19 +309,19 @@ export default function ReportsPage() {
           {/* TAB 3: MONTHLY (PREVIOUS MONTH) REPORT */}
           {activeReportTab === 'monthly' && (
             <div className="space-y-6">
-              {/* Report Header Card */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              {/* Header Range Card */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
                   <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                       Report Type
                     </span>
-                    <h2 className="text-lg font-bold text-brand-dark">
+                    <h2 className="text-base sm:text-lg font-bold text-brand-dark">
                       Monthly Report (Previous Month)
                     </h2>
                   </div>
                   <div className="text-left sm:text-right">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                       Date Range
                     </span>
                     <div className="text-sm font-bold text-gray-900">
@@ -339,7 +337,7 @@ export default function ReportsPage() {
                   description={`No glucose entries were recorded between ${formatDateDisplay(reportsData.monthly.range.startDate)} and ${formatDateDisplay(reportsData.monthly.range.endDate)}.`}
                 />
               ) : (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   <SummaryCard
                     title="Highest Reading"
                     value={reportsData.monthly.highest}
@@ -374,4 +372,3 @@ export default function ReportsPage() {
     </div>
   );
 }
-

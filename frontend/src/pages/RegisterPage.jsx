@@ -30,27 +30,27 @@ export default function RegisterPage({ onSwitchToLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="w-12 h-12 rounded-lg bg-brand-primary flex items-center justify-center text-white mx-auto shadow-sm">
           <Activity className="w-7 h-7 stroke-[2.2]" />
         </div>
-        <h1 className="mt-4 text-2xl font-bold tracking-tight text-brand-dark">
+        <h1 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-brand-dark">
           Sweety
         </h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-xs sm:text-sm text-gray-600">
           Create your account to start tracking blood glucose
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm border border-gray-200 rounded-lg sm:px-10">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">
+      <div className="mt-6 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-6 sm:py-8 px-5 sm:px-10 shadow-sm border border-gray-200 rounded-lg">
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-5">
             Register new patient account
           </h2>
 
           {error && (
-            <div className="mb-5 p-3.5 bg-red-50 border border-brand-soft rounded-md flex items-start space-x-2.5 text-sm text-brand-crimson">
+            <div className="mb-5 p-3.5 bg-red-50 border border-brand-soft rounded-md flex items-start space-x-2.5 text-xs sm:text-sm text-brand-crimson">
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-brand-primary" />
               <span className="font-medium">{error}</span>
             </div>
@@ -110,7 +110,7 @@ export default function RegisterPage({ onSwitchToLogin }) {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-xs sm:text-sm text-gray-600">
             Already have an account?{' '}
             <button
               onClick={onSwitchToLogin}
@@ -124,4 +124,3 @@ export default function RegisterPage({ onSwitchToLogin }) {
     </div>
   );
 }
-

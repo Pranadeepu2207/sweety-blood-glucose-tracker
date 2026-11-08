@@ -14,7 +14,7 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-12 h-12 rounded-lg bg-brand-primary flex items-center justify-center text-white mx-auto mb-3 animate-pulse shadow-sm">
             <Activity className="w-6 h-6 stroke-[2.2]" />
@@ -33,14 +33,14 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col antialiased">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <main className="flex-1">
+      <main className="flex-1 w-full">
         {activeTab === 'dashboard' && <DashboardPage />}
         {activeTab === 'reports' && <ReportsPage />}
       </main>
       <footer className="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
-        Sweety Blood Glucose Tracker &middot; Clinical Patient Portal
+        Sweety Blood Glucose Tracker &middot; Patient Portal
       </footer>
     </div>
   );
@@ -53,4 +53,3 @@ export default function App() {
     </AuthProvider>
   );
 }
-

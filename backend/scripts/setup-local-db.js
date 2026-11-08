@@ -84,3 +84,4 @@ JWT_EXPIRES_IN=7d
 fs.writeFileSync(envPath, envContent, 'utf8');
 console.log('[Local DB] Created backend/.env with port 5433 credentials.');
 console.log('[Local DB] You can now run: npm run migrate');
+

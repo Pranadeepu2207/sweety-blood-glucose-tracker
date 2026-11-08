@@ -10,7 +10,7 @@ Sweety is a clinical blood glucose tracking web application designed for diabete
 - **Database**: PostgreSQL (connection pooling via `pg`, strict constraints, indexes)
 - **Frontend**: React (Vite), Tailwind CSS, Lucide React SVG icons
 - **Security**: Passwords hashed with `bcryptjs` (salt rounds: 10), JWT session authentication
-- **Design System**: Neutral surfaces with custom clinical palette:
+- **Design System**: Clean, responsive surfaces with custom clinical palette:
   - Primary Brand Red: `#CD1C18`
   - Deep Crimson Accent: `#9B1313`
   - Dark Cherry / Burgundy: `#38000A`
@@ -106,49 +106,36 @@ JWT_EXPIRES_IN=7d
 
 ---
 
-### Step 3: Install Dependencies
-Install dependencies across root, backend, and frontend:
+### Step 3: Set Up Database
 
-```bash
-# Using root shortcut
-npm run install:all
-
-# Or individually:
-npm install
-npm install --prefix backend
-npm install --prefix frontend
-```
-
----
-
-### Step 4: Set Up the Database & Run Migrations
-
-1. Ensure your PostgreSQL service is running on your machine.
-2. Run the migration script to automatically create `sweety_db` and tables (`users`, `readings`):
-
+#### Option A: Use Your Existing PostgreSQL Service
+Run migrations and seeds against your local PostgreSQL:
 ```bash
 npm run migrate
-```
-
----
-
-### Step 5: Seed Demo Data
-Populate the database with a pre-configured demo patient and sample readings across today, month-to-date, and previous month:
-
-```bash
 npm run seed
 ```
 
-**Demo Account Credentials:**
-- Email: `demo@sweety.app`
-- Password: `Password123!`
+#### Option B: Standalone Zero-Password Local Cluster
+If you do not remember your PostgreSQL password or want an isolated instance:
+```bash
+npm run db:local
+npm run migrate
+npm run seed
+```
 
 ---
 
-### Step 6: Start Server & Client
+### Step 4: Demo Account Credentials
+The seed script creates a demo patient populated with realistic sample readings across today, month-to-date, and previous month:
+- **Email**: `demo@sweety.app`
+- **Password**: `Password123!`
+*(You can also click "Fill Demo Credentials" on the login screen to sign in instantly).*
 
-You can run both concurrently from the root directory:
+---
 
+### Step 5: Start Server & Client
+
+Run both concurrently from the root directory:
 ```bash
 npm run dev
 ```
@@ -158,20 +145,18 @@ Or run them in separate terminal windows:
 **Terminal 1 (Backend API):**
 ```bash
 npm run dev:backend
-# Starts at http://localhost:5000
+# Runs at http://localhost:5000
 ```
 
 **Terminal 2 (Frontend Client):**
 ```bash
 npm run dev:frontend
-# Starts at http://localhost:3000
+# Runs at http://localhost:3000
 ```
-
-Open your browser at `http://localhost:3000`. You can click "Fill Demo Credentials" on the login screen to sign in instantly.
 
 ---
 
-### Step 7: Running the Test Suite
+### Step 6: Running the Test Suite
 The automated test suite verifies all 5 validation rules, exact error strings, report calculations, rounding, empty states, auth hashing, and pagination:
 
 ```bash
@@ -188,8 +173,6 @@ npm test
 3. **Previous Month Boundaries**: For the Monthly report, the date range spans from the 1st of the previous month to the final calendar day of that month (correctly handling February leap years and 30/31-day months). If the selected date is in January, the previous month seamlessly resolves to December of the prior calendar year.
 
 ### What I Would Improve With More Time
-1. **Doctor Portal View**: Complete the full doctor role workflow where medical practitioners can accept patient invitations and review longitudinal trend graphs and HbA1c approximations.
-2. **CSV / PDF Clinical Export**: Allow patients to export their monthly summary as a structured PDF report to hand to their endocrinologist during clinical visits.
-3. **Automated Reminders**: Push notifications or browser reminders for unlogged daily slots after fasting or dinner.
-4. **Target Range Customization**: Allow patients with specific clinical guidelines to customize target ranges (e.g., gestational diabetes targets).
-
+1. **CSV / PDF Clinical Export**: Allow patients to export their monthly summary as a structured PDF report to hand to their endocrinologist during clinical visits.
+2. **Automated Reminders**: Push notifications or browser reminders for unlogged daily slots after fasting or dinner.
+3. **Target Range Customization**: Allow patients with specific clinical guidelines to customize target ranges (e.g. gestational diabetes targets).

@@ -9,46 +9,12 @@ async function seed() {
 
   // Ensure database and schema exist first
   const migrate = require('./migrate');
-  await migrate();
+  await migrate(false);
 
   const db = require('../config/db');
 
   try {
-    // 1. Ensure tables exist
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        role VARCHAR(20) DEFAULT 'patient',
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
-
-      CREATE TABLE IF NOT EXISTS readings (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        reading_date DATE NOT NULL,
-        slot VARCHAR(50) NOT NULL,
-        value INTEGER NOT NULL CHECK (value >= 40 AND value <= 600),
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        CONSTRAINT uq_user_date_slot UNIQUE (user_id, reading_date, slot)
-      );
-
-      CREATE TABLE IF NOT EXISTS doctor_patients (
-        id SERIAL PRIMARY KEY,
-        doctor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        patient_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        CONSTRAINT uq_doctor_patient UNIQUE (doctor_id, patient_id)
-      );
-
-      CREATE INDEX IF NOT EXISTS idx_readings_user_date ON readings(user_id, reading_date);
-      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-    `);
-
-    // 2. Create Demo Patient
+    // Create Demo Patient
     const demoEmail = 'demo@sweety.app';
     const demoPassword = 'Password123!';
     const passwordHash = await bcrypt.hash(demoPassword, 10);
@@ -65,35 +31,10 @@ async function seed() {
     const demoUserId = userRes.rows[0].id;
     console.log(`[Seed] Demo Patient active: ID ${demoUserId} (${demoEmail})`);
 
-    // 3. Create Demo Doctor (Bonus Role)
-    const doctorEmail = 'doctor@sweety.app';
-    const doctorPassword = 'Password123!';
-    const doctorHash = await bcrypt.hash(doctorPassword, 10);
-
-    const doctorRes = await db.query(
-      `INSERT INTO users (name, email, password_hash, role)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (email) DO UPDATE
-       SET password_hash = EXCLUDED.password_hash, name = EXCLUDED.name, role = EXCLUDED.role
-       RETURNING id, name, email`,
-      ['Dr. Sarah Chen, MD', doctorEmail, doctorHash, 'doctor']
-    );
-
-    const demoDoctorId = doctorRes.rows[0].id;
-    console.log(`[Seed] Demo Doctor active: ID ${demoDoctorId} (${doctorEmail})`);
-
-    // Assign Demo Patient to Demo Doctor
-    await db.query(
-      `INSERT INTO doctor_patients (doctor_id, patient_id)
-       VALUES ($1, $2)
-       ON CONFLICT (doctor_id, patient_id) DO NOTHING`,
-      [demoDoctorId, demoUserId]
-    );
-
-    // 4. Clear existing readings for clean reproducible demo data
+    // Clear existing readings for clean reproducible demo data
     await db.query('DELETE FROM readings WHERE user_id = $1', [demoUserId]);
 
-    // 5. Generate sample readings
+    // Generate realistic sample readings
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
@@ -114,7 +55,7 @@ async function seed() {
       'After dinner'
     ];
 
-    // Readings for Today (up to after lunch or all 4 slots)
+    // Readings for Today (3 slots logged, 1 pending)
     const todayDateStr = formatDate(currentYear, currentMonth, currentDay);
     sampleReadings.push(
       { date: todayDateStr, slot: slots[0], value: 92 },
@@ -167,9 +108,9 @@ async function seed() {
 
     console.log(`[Seed] Successfully inserted ${sampleReadings.length} sample readings.`);
     console.log('----------------------------------------------------');
-    console.log('Demo Credentials:');
-    console.log(`Patient: ${demoEmail} / ${demoPassword}`);
-    console.log(`Doctor:  ${doctorEmail} / ${doctorPassword}`);
+    console.log('Demo Patient Account:');
+    console.log(`Email:    ${demoEmail}`);
+    console.log(`Password: ${demoPassword}`);
     console.log('----------------------------------------------------');
   } catch (err) {
     console.error('[Seed] Error during seeding:', err);

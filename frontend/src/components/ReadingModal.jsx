@@ -21,7 +21,6 @@ export default function ReadingModal({
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Helper for today's date string YYYY-MM-DD
   const getTodayString = () => {
     const now = new Date();
     const y = now.getFullYear();
@@ -53,7 +52,7 @@ export default function ReadingModal({
     e.preventDefault();
     setError(null);
 
-    // Frontend pre-validation to match assignment rules directly
+    // Frontend validation matching assignment rules directly
     if (readingDate > todayStr) {
       setError('Date cannot be in the future.');
       return;
@@ -86,11 +85,11 @@ export default function ReadingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-md w-full shadow-xl border border-gray-200 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-40 flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white rounded-lg max-w-md w-full shadow-xl border border-gray-200 overflow-hidden my-6">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-base font-bold text-brand-dark">
+        <div className="px-5 sm:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-sm sm:text-base font-bold text-brand-dark">
             {initialData?.id ? 'Edit Blood Glucose Reading' : 'Log Blood Glucose Reading'}
           </h3>
           <button
@@ -103,9 +102,9 @@ export default function ReadingModal({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-brand-soft rounded-md flex items-start space-x-2 text-sm text-brand-crimson">
+            <div className="p-3 bg-red-50 border border-brand-soft rounded-md flex items-start space-x-2 text-xs sm:text-sm text-brand-crimson">
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-brand-primary" />
               <span className="font-medium">{error}</span>
             </div>
@@ -124,7 +123,7 @@ export default function ReadingModal({
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white"
             />
-            <span className="text-xs text-gray-400 mt-1 block">Date cannot be in the future</span>
+            <span className="text-[11px] text-gray-400 mt-1 block">Date cannot be in the future</span>
           </div>
 
           {/* Time Slot Field */}
@@ -165,23 +164,23 @@ export default function ReadingModal({
                 mg/dl
               </div>
             </div>
-            <span className="text-xs text-gray-400 mt-1 block">Whole number between 40 and 600</span>
+            <span className="text-[11px] text-gray-400 mt-1 block">Whole number between 40 and 600</span>
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-3 border-t border-gray-100 flex items-center justify-end space-x-3">
+          <div className="pt-3 border-t border-gray-100 flex items-center justify-end space-x-2.5 sm:space-x-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-3.5 sm:px-4 py-2 border border-gray-300 rounded-md text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-brand-primary text-white rounded-md text-sm font-medium hover:bg-brand-crimson transition-colors shadow-sm disabled:opacity-50"
+              className="px-3.5 sm:px-4 py-2 bg-brand-primary text-white rounded-md text-xs sm:text-sm font-semibold hover:bg-brand-crimson transition-colors shadow-sm disabled:opacity-50"
             >
               {isSubmitting ? 'Saving...' : initialData?.id ? 'Save Changes' : 'Log Reading'}
             </button>
@@ -191,4 +190,3 @@ export default function ReadingModal({
     </div>
   );
 }
-

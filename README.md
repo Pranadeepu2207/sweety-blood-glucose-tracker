@@ -106,34 +106,20 @@ JWT_EXPIRES_IN=7d
 
 ---
 
-### Step 3: Set Up Database
-
-#### Option A: Use Your Existing PostgreSQL Service
+### Step 3: Set Up Database & Seed Data
 Run migrations and seeds against your local PostgreSQL:
 ```bash
 npm run migrate
 npm run seed
 ```
 
-#### Option B: Standalone Zero-Password Local Cluster
-If you do not remember your PostgreSQL password or want an isolated instance:
-```bash
-npm run db:local
-npm run migrate
-npm run seed
-```
-
----
-
-### Step 4: Demo Account Credentials
-The seed script creates a demo patient populated with realistic sample readings across today, month-to-date, and previous month:
+**Demo Account Credentials:**
 - **Email**: `demo@sweety.app`
 - **Password**: `Password123!`
-*(You can also click "Fill Demo Credentials" on the login screen to sign in instantly).*
 
 ---
 
-### Step 5: Start Server & Client
+### Step 4: Start Server & Client
 
 Run both concurrently from the root directory:
 ```bash
@@ -152,15 +138,6 @@ npm run dev:backend
 ```bash
 npm run dev:frontend
 # Runs at http://localhost:3000
-```
-
----
-
-### Step 6: Running the Test Suite
-The automated test suite verifies all 5 validation rules, exact error strings, report calculations, rounding, empty states, auth hashing, and pagination:
-
-```bash
-npm test
 ```
 
 ---

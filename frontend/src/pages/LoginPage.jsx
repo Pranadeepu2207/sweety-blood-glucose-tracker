@@ -23,11 +23,6 @@ export default function LoginPage({ onSwitchToRegister }) {
     }
   };
 
-  const handleFillDemo = () => {
-    setEmail('demo@sweety.app');
-    setPassword('Password123!');
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
@@ -92,18 +87,6 @@ export default function LoginPage({ onSwitchToRegister }) {
               {loading ? 'Logging in...' : 'Log in'}
             </button>
           </form>
-
-          {/* Quick Demo Helper */}
-          <div className="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between text-xs">
-            <span className="text-gray-500">Evaluating this app?</span>
-            <button
-              type="button"
-              onClick={handleFillDemo}
-              className="font-semibold text-brand-primary hover:text-brand-crimson transition-colors"
-            >
-              Fill Demo Credentials
-            </button>
-          </div>
 
           <div className="mt-6 text-center text-xs sm:text-sm text-gray-600">
             Don't have an account?{' '}

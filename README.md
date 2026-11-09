@@ -150,15 +150,3 @@ You can log in immediately using the pre-seeded demo account:
 *(You can also register a brand new patient account from the sign-up page).*
 
 ---
-
-## Notes & Assumptions
-
-### Assumptions I Made
-1. **Clinical Time Slots**: The 4 slots (`Morning (fasting)`, `After breakfast`, `After lunch`, `After dinner`) represent the standard daily monitoring points for diabetic care. A patient can record at most one reading per slot per calendar day, resulting in a daily maximum of 4 readings.
-2. **Timezone Handling**: To prevent false "Date cannot be in the future" rejections when patients log readings close to midnight in different time zones, the frontend passes the client's timezone offset via an `x-timezone-offset` header so the server evaluates the calendar day accurately.
-3. **Previous Month Calculations**: For the Monthly report, the date range spans from the 1st of the previous month to the final calendar day of that month. If the selected date is in January, the previous month automatically rolls back to December of the prior calendar year.
-
-### What I Would Improve With More Time
-1. **PDF / CSV Clinical Export**: Give patients the ability to download their monthly report as a printable PDF to bring to consultations with their doctor.
-2. **Reminders & Notifications**: Browser push notifications reminding patients to log pending slots after key meal times.
-3. **Target Range Personalization**: Allow patients with specific clinical advice (such as gestational diabetes) to customize their personal target thresholds.

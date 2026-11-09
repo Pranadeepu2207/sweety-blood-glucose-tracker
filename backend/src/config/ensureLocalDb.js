@@ -2,10 +2,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Automatically ensures the local standalone PostgreSQL cluster is running
- * if using backend/.local_pg_data on port 5433.
- */
+// Helper to start the local cluster if someone is using port 5433
 function ensurePostgresRunning() {
   const localDataDir = path.join(__dirname, '../../.local_pg_data');
   if (!fs.existsSync(localDataDir)) return;

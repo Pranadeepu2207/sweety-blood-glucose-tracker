@@ -1,9 +1,6 @@
 const db = require('../config/db');
 
-/**
- * List readings for current user with optional pagination and date filter.
- * GET /api/readings?page=1&limit=20&date=YYYY-MM-DD
- */
+// Fetch user readings with optional date filter and pagination
 async function getReadings(req, res) {
   try {
     const userId = req.user.id;
@@ -20,7 +17,6 @@ async function getReadings(req, res) {
       whereClause += ` AND reading_date = $${queryParams.length}`;
     }
 
-    // Get total count
     const countResult = await db.query(
       `SELECT COUNT(*) FROM readings ${whereClause}`,
       queryParams
@@ -28,7 +24,7 @@ async function getReadings(req, res) {
     const total = parseInt(countResult.rows[0].count, 10);
     const totalPages = Math.ceil(total / limit) || 1;
 
-    // Slot ordering expression for intuitive daily chronological ordering
+    // Order slots in typical daily order: morning -> breakfast -> lunch -> dinner
     const slotOrderSql = `
       CASE slot
         WHEN 'Morning (fasting)' THEN 1
@@ -39,7 +35,6 @@ async function getReadings(req, res) {
       END
     `;
 
-    // Fetch paginated readings
     const dataParams = [...queryParams, limit, offset];
     const dataResult = await db.query(
       `SELECT id, user_id, TO_CHAR(reading_date, 'YYYY-MM-DD') AS reading_date, slot, value, created_at, updated_at
@@ -65,10 +60,7 @@ async function getReadings(req, res) {
   }
 }
 
-/**
- * Get a single reading by ID
- * GET /api/readings/:id
- */
+// Fetch single reading by ID (ensuring it belongs to the logged-in user)
 async function getReadingById(req, res) {
   try {
     const userId = req.user.id;
@@ -96,10 +88,7 @@ async function getReadingById(req, res) {
   }
 }
 
-/**
- * Create a new blood glucose reading
- * POST /api/readings
- */
+// Insert a new blood glucose reading
 async function createReading(req, res) {
   try {
     const userId = req.user.id;
@@ -119,7 +108,6 @@ async function createReading(req, res) {
   } catch (err) {
     console.error('Error creating reading:', err);
     if (err.code === '23505') {
-      // Postgres unique constraint violation fallback
       const startsWithVowel = /^[aeiou]/i.test(req.body.slot.trim());
       const article = startsWithVowel ? 'an' : 'a';
       return res.status(400).json({
@@ -130,10 +118,7 @@ async function createReading(req, res) {
   }
 }
 
-/**
- * Update an existing reading
- * PUT /api/readings/:id
- */
+// Update an existing reading
 async function updateReading(req, res) {
   try {
     const userId = req.user.id;
@@ -144,7 +129,6 @@ async function updateReading(req, res) {
       return res.status(400).json({ error: 'Invalid reading ID.' });
     }
 
-    // Verify reading belongs to user
     const checkResult = await db.query(
       'SELECT id FROM readings WHERE id = $1 AND user_id = $2',
       [readingId, userId]
@@ -179,10 +163,7 @@ async function updateReading(req, res) {
   }
 }
 
-/**
- * Delete a reading
- * DELETE /api/readings/:id
- */
+// Delete an existing reading
 async function deleteReading(req, res) {
   try {
     const userId = req.user.id;
@@ -215,4 +196,3 @@ module.exports = {
   updateReading,
   deleteReading
 };
-

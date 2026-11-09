@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_sweety_jwt_key_replace_in_production';
 
+// Verifies Bearer JWT token from the Authorization header
 function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -24,4 +25,3 @@ module.exports = {
   requireAuth,
   JWT_SECRET
 };
-

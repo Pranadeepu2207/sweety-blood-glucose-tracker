@@ -1,104 +1,136 @@
-# Sweety: Blood Glucose Tracker (Node.js + Express + PostgreSQL + React)
+# Sweety - Blood Glucose Tracker
 
-Sweety is a clinical blood glucose tracking web application designed for diabetes patients. Patients record up to 4 blood glucose readings a day across designated time slots and review daily, month-to-date, and previous-month summary reports.
-
----
-
-## Tech Stack & Architecture
-
-- **Backend**: Node.js, Express.js REST API
-- **Database**: PostgreSQL (connection pooling via `pg`, strict constraints, indexes)
-- **Frontend**: React (Vite), Tailwind CSS, Lucide React SVG icons
-- **Security**: Passwords hashed with `bcryptjs` (salt rounds: 10), JWT session authentication
-- **Design System**: Clean, responsive surfaces with custom clinical palette:
-  - Primary Brand Red: `#CD1C18`
-  - Deep Crimson Accent: `#9B1313`
-  - Dark Cherry / Burgundy: `#38000A`
-  - Soft Coral Tint: `#FFA896`
+I built Sweety as a clean, full-stack web application for diabetes patients to log daily blood glucose readings and view structured clinical reports. The project is built using Node.js, Express, PostgreSQL, and React (Vite + Tailwind CSS).
 
 ---
 
-## Features
+## What I Built (Features)
 
-### 1. Authentication & Security
-- Registration with full name, email, and password.
-- Secure login with bcrypt password verification and JWT token issuance.
-- Complete patient isolation: patients only see and modify their own readings.
+### 1. User Authentication & Privacy
+- Patients can sign up with their name, email, and password, and log in securely.
+- Passwords are encrypted using `bcrypt` (never stored in plain text).
+- Authentication uses JSON Web Tokens (JWT).
+- Complete data isolation: once logged in, a patient can only see, create, edit, or delete their own readings.
 
-### 2. Blood Glucose Logging (Full CRUD)
-- Designated 4 time slots:
-  1. `Morning (fasting)`
-  2. `After breakfast`
-  3. `After lunch`
-  4. `After dinner`
-- Interactive 4-slot progress tracker for the selected date.
-- Real-time clinical indicators:
+### 2. Blood Glucose Tracking (Full CRUD)
+- Patients can log readings across 4 designated daily slots:
+  - Morning (fasting)
+  - After breakfast
+  - After lunch
+  - After dinner
+- The dashboard includes a daily slot tracker showing at a glance which slots have been recorded and which are still pending.
+- Real-time indicator badges help patients see where their reading lands:
   - Low (&lt;70 mg/dl)
   - In Range (70 to 140 mg/dl)
   - Elevated (&gt;140 mg/dl)
+- Patients can edit or delete any logged reading with full confirmation dialogs.
 
-### 3. Strict Validation Rules
-All validation errors return HTTP 400 and display directly in the UI:
+### 3. Strict Input Validation
+I implemented strict server-side and client-side validation rules that return clear, user-friendly error messages:
+- **Value is required**: `"Please enter a glucose value."`
+- **Whole number between 40 and 600**: `"Value must be between 40 and 600 mg/dl."`
+- **Only one reading per slot per day**: `"You already have an After lunch reading for this date."` (enforced at both application and database constraint levels).
+- **Maximum 4 readings per day**: `"You can add only 4 readings per day."`
+- **Date cannot be in the future**: `"Date cannot be in the future."`
 
-| Rule | Trigger Condition | Exact Error Message |
-| :--- | :--- | :--- |
-| Value is required | Empty or whitespace value | `"Please enter a glucose value."` |
-| Whole number between 40 and 600 | Non-integer, &lt; 40 or &gt; 600 | `"Value must be between 40 and 600 mg/dl."` |
-| Only one reading per slot per day | Slot already recorded for that date | `"You already have an After lunch reading for this date."` |
-| Maximum 4 readings per day | 4 readings already exist on that date | `"You can add only 4 readings per day."` |
-| Date cannot be in the future | Date is after today's local date | `"Date cannot be in the future."` |
+### 4. Daily & Monthly Reports
+Patients can pick any calendar date to view three distinct clinical reports:
+- **Daily Report**: Aggregates readings on the selected date and lists each individual reading alongside its slot.
+- **Month-to-Date Report**: Calculates aggregated metrics from the 1st of the current month up to the selected date.
+- **Monthly Report (Previous Month)**: Aggregates all readings across the entire previous calendar month (handling February leap years and varying month lengths automatically).
+- Each report calculates: Highest reading, Lowest reading, Average reading (rounded to 1 decimal place), and Total count of readings.
+- Friendly empty states are displayed when no readings exist for the selected period.
 
-### 4. Clinical Reports
-Each report computes: Highest, Lowest, Average (rounded to 1 decimal place), and Total count. When no readings exist, a friendly empty state is rendered.
+### 5. Bonus Feature: API Pagination
+- The `GET /api/readings` endpoint supports pagination parameters (`?page=1&limit=20`).
+- The dashboard UI includes pagination controls to navigate across large historical datasets easily.
 
-- **Daily Report**: Aggregates the selected date (e.g. 15 Oct 2026) and lists each individual reading with its slot.
-- **Month-to-Date (MTD) Report**: Aggregates readings from the 1st of the month to the selected date (e.g. 1 Oct to 15 Oct 2026).
-- **Monthly Report**: Aggregates readings across the whole previous month (e.g. 1 Sep to 30 Sep 2026).
-
-### 5. Bonus Capabilities
-- **API Pagination**: `GET /api/readings?page=1&limit=20` with page metadata (`page`, `limit`, `total`, `totalPages`).
-- **Date Filtering**: `GET /api/readings?date=YYYY-MM-DD`.
+### 6. Clean, Responsive UI
+- Styled with a purpose-built color palette:
+  - Primary Brand Red: `#CD1C18`
+  - Deep Crimson: `#9B1313`
+  - Dark Header / Text: `#38000A`
+  - Soft Coral Tint: `#FFA896`
+- Fully responsive: Desktop and tablet viewports use a full data table, while mobile viewports automatically adapt into clean, touch-friendly card layouts.
+- Built with standard rounded corners and clean SVG icons from Lucide.
 
 ---
 
-## Quick Setup Guide (For Anyone Cloning This Repository)
+## How to Clone and Run the App (Step-by-Step)
 
-When someone clones this repository, they need to initialize their local database instance. We have provided a single setup command:
+If you are cloning this repository on your computer, follow these steps to get up and running:
 
-### 1. Clone & Configure Environment
+### Prerequisites
+- Node.js (v18 or higher recommended)
+- npm (v9 or higher)
+- PostgreSQL installed and running locally
+
+---
+
+### Step 1: Clone the Repository
 ```bash
 git clone <repository-url>
 cd "sweety - blood glucose tracker"
+```
+
+---
+
+### Step 2: Set Up Environment Variables
+Copy `.env.example` to create your local `.env` file for the backend:
+
+```bash
 cp .env.example backend/.env
 ```
 
-Verify your PostgreSQL credentials in `backend/.env` (default is user `postgres` on port 5432):
+Open `backend/.env` and verify your PostgreSQL credentials. By default, it connects to local PostgreSQL:
+
 ```env
 PORT=5000
 NODE_ENV=development
+
+# PostgreSQL connection settings:
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/sweety_db
+
+# Or individual parameters:
 PGHOST=localhost
 PGPORT=5432
 PGUSER=postgres
-PGPASSWORD=postgres
+PGPASSWORD=your_postgres_password
 PGDATABASE=sweety_db
-JWT_SECRET=super_secret_sweety_jwt_key_replace_in_production
+
+JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRES_IN=7d
 ```
 
-### 2. Run All-In-One Setup
-Run this single command to install all dependencies, auto-create the database, apply migrations, and seed sample data:
+*(Note: `.env` is ignored by Git, so your credentials will stay private on your machine).*
+
+---
+
+### Step 3: Run the Setup Script
+To make setting up fast and simple, I created a single setup script:
+
 ```bash
 npm run setup
 ```
 
-*(Alternatively, you can run the steps individually: `npm run install:all`, `npm run migrate`, and `npm run seed`).*
+This single command:
+1. Installs all root, backend, and frontend dependencies.
+2. Automatically creates the `sweety_db` PostgreSQL database if it does not already exist.
+3. Applies all database tables, constraints, and indexes (`npm run migrate`).
+4. Seeds the demo patient account with sample readings spanning today, the current month, and the previous month (`npm run seed`).
 
-**Demo Account Credentials:**
-- **Email**: `demo@sweety.app`
-- **Password**: `Password123!`
+*If you prefer running the steps individually, you can also run:*
+```bash
+npm run install:all
+npm run migrate
+npm run seed
+```
 
-### 3. Start the Application
+---
+
+### Step 4: Start the Development Server
+Start both the backend server and the frontend client simultaneously:
+
 ```bash
 npm run dev
 ```
@@ -106,18 +138,27 @@ npm run dev
 - **Frontend Client**: [http://localhost:3000](http://localhost:3000)
 - **Backend API**: [http://localhost:5000](http://localhost:5000)
 
-*Note: The backend server also includes automatic database initialization on startup, ensuring that `sweety_db` and tables exist whenever the server starts.*
+---
+
+## Demo Credentials
+
+You can log in immediately using the pre-seeded demo account:
+
+- **Email**: `demo@sweety.app`
+- **Password**: `Password123!`
+
+*(You can also register a brand new patient account from the sign-up page).*
 
 ---
 
 ## Notes & Assumptions
 
-### Assumptions
-1. **Time Slot Constraints**: The 4 clinical slots (`Morning (fasting)`, `After breakfast`, `After lunch`, `After dinner`) represent distinct phases of a patient's metabolic day. Each slot can be recorded at most once per calendar date, capped at 4 total per day.
-2. **Future Date Boundary**: The client provides timezone offset information via `x-timezone-offset` headers so the server evaluates "today" using the patient's local calendar day rather than standard UTC midnight.
-3. **Previous Month Boundaries**: For the Monthly report, the date range spans from the 1st of the previous month to the final calendar day of that month (correctly handling February leap years and 30/31-day months). If the selected date is in January, the previous month seamlessly resolves to December of the prior calendar year.
+### Assumptions I Made
+1. **Clinical Time Slots**: The 4 slots (`Morning (fasting)`, `After breakfast`, `After lunch`, `After dinner`) represent the standard daily monitoring points for diabetic care. A patient can record at most one reading per slot per calendar day, resulting in a daily maximum of 4 readings.
+2. **Timezone Handling**: To prevent false "Date cannot be in the future" rejections when patients log readings close to midnight in different time zones, the frontend passes the client's timezone offset via an `x-timezone-offset` header so the server evaluates the calendar day accurately.
+3. **Previous Month Calculations**: For the Monthly report, the date range spans from the 1st of the previous month to the final calendar day of that month. If the selected date is in January, the previous month automatically rolls back to December of the prior calendar year.
 
 ### What I Would Improve With More Time
-1. **CSV / PDF Clinical Export**: Allow patients to export their monthly summary as a structured PDF report to hand to their endocrinologist during clinical visits.
-2. **Automated Reminders**: Push notifications or browser reminders for unlogged daily slots after fasting or dinner.
-3. **Target Range Customization**: Allow patients with specific clinical guidelines to customize target ranges (e.g. gestational diabetes targets).
+1. **PDF / CSV Clinical Export**: Give patients the ability to download their monthly report as a printable PDF to bring to consultations with their doctor.
+2. **Reminders & Notifications**: Browser push notifications reminding patients to log pending slots after key meal times.
+3. **Target Range Personalization**: Allow patients with specific clinical advice (such as gestational diabetes) to customize their personal target thresholds.

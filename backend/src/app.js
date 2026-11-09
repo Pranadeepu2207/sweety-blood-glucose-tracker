@@ -7,7 +7,6 @@ const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
 
-// Middleware
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -16,26 +15,26 @@ app.use(cors({
 
 app.use(express.json());
 
-// Health Check
+// Basic health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Routes
+// Mount API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/readings', readingRoutes);
 app.use('/api/reports', reportRoutes);
 
-// 404 Route Handler
+// Catch-all 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
 });
 
-// Global Error Handler
+// Centralized error handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled application error:', err);
+  console.error('Server error:', err);
   res.status(err.status || 500).json({
-    error: err.message || 'An unexpected internal server error occurred.'
+    error: err.message || 'An unexpected error occurred.'
   });
 });
 

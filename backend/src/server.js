@@ -6,27 +6,26 @@ const db = require('./config/db');
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
-  // Ensure local PostgreSQL instance is running if using port 5433
+  // Make sure local Postgres is active before accepting requests
   ensureLocalDb();
 
   try {
-    // Automatically ensure database and schema exist on startup
+    // Run migrations on boot so tables always exist
     const migrate = require('./db/migrate');
     await migrate(false);
 
-    // Verify database connection
+    // Verify DB connectivity
     const dbTime = await db.checkConnection();
-    console.log(`[Sweety API] Connected to PostgreSQL successfully at ${dbTime.now}`);
+    console.log(`[Sweety API] Connected to PostgreSQL at ${dbTime.now}`);
 
     app.listen(PORT, () => {
       console.log(`[Sweety API] Server running on port ${PORT} (http://localhost:${PORT})`);
     });
   } catch (err) {
-    console.error('[Sweety API] Could not connect to PostgreSQL on startup:', err.message);
-    console.error('[Sweety API] Please ensure PostgreSQL is running and credentials in .env are correct.');
-    console.log(`[Sweety API] Starting server anyway on port ${PORT}...`);
+    console.error('[Sweety API] Database connection failed on startup:', err.message);
+    console.log('[Sweety API] Starting HTTP server anyway in case DB reconnects...');
     app.listen(PORT, () => {
-      console.log(`[Sweety API] Server listening on port ${PORT} (Database pending connection)`);
+      console.log(`[Sweety API] Server listening on port ${PORT}`);
     });
   }
 }

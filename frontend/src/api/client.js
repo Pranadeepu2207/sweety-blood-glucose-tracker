@@ -1,8 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
-/**
- * Universal fetch wrapper for Sweety API calls
- */
+// Helper for sending authenticated API requests
 export async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   const token = localStorage.getItem('sweety_token');
@@ -45,4 +43,3 @@ export const api = {
     apiRequest(endpoint, { ...options, method: 'PUT', body: JSON.stringify(body) }),
   delete: (endpoint, options) => apiRequest(endpoint, { ...options, method: 'DELETE' })
 };
-

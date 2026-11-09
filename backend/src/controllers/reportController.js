@@ -1,8 +1,6 @@
 const db = require('../config/db');
 
-/**
- * Calculates highest, lowest, average (rounded to 1 decimal), and count
- */
+// Calculates highest, lowest, rounded average (1 decimal), and count
 function calculateMetrics(readings) {
   if (!readings || readings.length === 0) {
     return {
@@ -27,27 +25,22 @@ function calculateMetrics(readings) {
   };
 }
 
-/**
- * Given a date string 'YYYY-MM-DD', returns the date ranges for:
- * - Daily: selected date
- * - Month-to-date: 1st of month to selected date
- * - Monthly: 1st to last day of previous month
- */
+// Computes daily, month-to-date, and whole previous month date windows
 function getReportDateRanges(dateStr) {
   const [yearStr, monthStr, dayStr] = dateStr.split('-');
   const year = parseInt(yearStr, 10);
-  const month = parseInt(monthStr, 10); // 1-12
+  const month = parseInt(monthStr, 10);
   const day = parseInt(dayStr, 10);
 
-  // 1. Daily
+  // Daily: specific date
   const dailyStart = dateStr;
   const dailyEnd = dateStr;
 
-  // 2. Month-to-date (MTD): 1st of month to selected date
+  // Month-to-date: 1st of current month through selected date
   const mtdStart = `${yearStr}-${monthStr}-01`;
   const mtdEnd = dateStr;
 
-  // 3. Monthly (Whole previous month)
+  // Monthly: entire prior calendar month
   let prevYear = year;
   let prevMonth = month - 1;
   if (prevMonth === 0) {
@@ -57,7 +50,6 @@ function getReportDateRanges(dateStr) {
   const prevMonthStr = String(prevMonth).padStart(2, '0');
   const prevYearStr = String(prevYear);
 
-  // Days in previous month
   const lastDayOfPrevMonth = new Date(Date.UTC(prevYear, prevMonth, 0)).getUTCDate();
   const monthlyStart = `${prevYearStr}-${prevMonthStr}-01`;
   const monthlyEnd = `${prevYearStr}-${prevMonthStr}-${String(lastDayOfPrevMonth).padStart(2, '0')}`;
@@ -69,16 +61,13 @@ function getReportDateRanges(dateStr) {
   };
 }
 
-/**
- * GET /api/reports/summary?date=YYYY-MM-DD
- */
+// Endpoint returning daily, month-to-date, and monthly summaries
 async function getReportsSummary(req, res) {
   try {
     const userId = req.user.id;
     let selectedDate = req.query.date;
 
     if (!selectedDate || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
-      // Default to today
       const now = new Date();
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, '0');
@@ -88,7 +77,6 @@ async function getReportsSummary(req, res) {
 
     const ranges = getReportDateRanges(selectedDate);
 
-    // Slot ordering expression
     const slotOrderSql = `
       CASE slot
         WHEN 'Morning (fasting)' THEN 1
@@ -99,7 +87,7 @@ async function getReportsSummary(req, res) {
       END
     `;
 
-    // 1. Fetch Daily readings
+    // 1. Daily readings (including slot breakdown)
     const dailyResult = await db.query(
       `SELECT id, TO_CHAR(reading_date, 'YYYY-MM-DD') AS reading_date, slot, value
        FROM readings
@@ -108,7 +96,7 @@ async function getReportsSummary(req, res) {
       [userId, ranges.daily.startDate]
     );
 
-    // 2. Fetch Month-to-date readings
+    // 2. Month-to-date values
     const mtdResult = await db.query(
       `SELECT value
        FROM readings
@@ -116,7 +104,7 @@ async function getReportsSummary(req, res) {
       [userId, ranges.mtd.startDate, ranges.mtd.endDate]
     );
 
-    // 3. Fetch Monthly (whole previous month) readings
+    // 3. Whole previous month values
     const monthlyResult = await db.query(
       `SELECT value
        FROM readings
@@ -155,4 +143,3 @@ module.exports = {
   calculateMetrics,
   getReportDateRanges
 };
-

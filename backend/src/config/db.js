@@ -4,6 +4,7 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
 require('dotenv').config();
 
+// Build connection options from DATABASE_URL or individual PG env variables
 const connectionConfig = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
@@ -20,7 +21,7 @@ const connectionConfig = process.env.DATABASE_URL
 const pool = new Pool(connectionConfig);
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle PostgreSQL client', err);
+  console.error('Unexpected error on idle PostgreSQL client:', err);
 });
 
 module.exports = {
@@ -36,4 +37,3 @@ module.exports = {
     }
   }
 };
-

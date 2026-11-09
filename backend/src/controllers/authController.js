@@ -5,9 +5,7 @@ const { JWT_SECRET } = require('../middleware/authMiddleware');
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
-/**
- * Generate JWT for authenticated user
- */
+// Creates a signed JWT for the user session
 function generateToken(user) {
   return jwt.sign(
     {
@@ -21,9 +19,7 @@ function generateToken(user) {
   );
 }
 
-/**
- * Register a new user
- */
+// Handles new user signups
 async function register(req, res) {
   try {
     const { name, email, password } = req.body;
@@ -42,17 +38,15 @@ async function register(req, res) {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Check if email already registered
+    // Check if email is already taken
     const existing = await db.query('SELECT id FROM users WHERE email = $1', [normalizedEmail]);
     if (existing.rows.length > 0) {
       return res.status(409).json({ error: 'An account with this email already exists.' });
     }
 
-    // Hash password with bcrypt
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+    // Hash with bcrypt before storing
+    const passwordHash = await bcrypt.hash(password, 10);
 
-    // Insert user
     const insertResult = await db.query(
       `INSERT INTO users (name, email, password_hash, role)
        VALUES ($1, $2, $3, $4)
@@ -79,9 +73,7 @@ async function register(req, res) {
   }
 }
 
-/**
- * Log in an existing user
- */
+// Handles user sign in
 async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -125,9 +117,7 @@ async function login(req, res) {
   }
 }
 
-/**
- * Get current authenticated user profile
- */
+// Returns the profile of the logged-in user
 async function me(req, res) {
   try {
     const userResult = await db.query(
@@ -151,4 +141,3 @@ module.exports = {
   login,
   me
 };
-

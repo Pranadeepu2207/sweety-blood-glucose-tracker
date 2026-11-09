@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Client, Pool } = require('pg');
+const { Client } = require('pg');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
 require('dotenv').config();
@@ -16,7 +16,8 @@ function getAdminConfig() {
         user: parsed.username || 'postgres',
         password: parsed.password || undefined,
         database: 'postgres',
-        targetDb: (parsed.pathname || '/sweety_db').replace(/^\//, '') || 'sweety_db'
+        targetDb: (parsed.pathname || '/sweety_db').replace(/^\//, '') || 'sweety_db',
+        isRemote: !['localhost', '127.0.0.1'].includes(parsed.hostname)
       };
     } catch (e) {
       // fallback
@@ -29,11 +30,15 @@ function getAdminConfig() {
     user: process.env.PGUSER || 'postgres',
     password: process.env.PGPASSWORD || undefined,
     database: 'postgres',
-    targetDb: process.env.PGDATABASE || 'sweety_db'
+    targetDb: process.env.PGDATABASE || 'sweety_db',
+    isRemote: false
   };
 }
 
 async function ensureDatabaseExists(adminConfig) {
+  // Managed cloud databases are already created and disallow CREATE DATABASE
+  if (adminConfig.isRemote) return;
+
   const client = new Client({
     host: adminConfig.host,
     port: adminConfig.port,
@@ -72,7 +77,6 @@ async function migrate(shouldClosePool = false) {
 
   await ensureDatabaseExists(adminConfig);
 
-  // Connect to target database and apply schema
   const db = require('../config/db');
   const schemaPath = path.join(__dirname, 'schema.sql');
   const schemaSql = fs.readFileSync(schemaPath, 'utf8');
